@@ -15,6 +15,6 @@ form.addEventListener("submit", evt => {
         }
     })
     .then(result=>{
-        if( result.status === 200) window.location.href = "/products"
+        if(result.status === 200) window.location.href = "/api/session/current"
     })
 })

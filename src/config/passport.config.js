@@ -3,6 +3,7 @@ import local from "passport-local"
 import userModel from "../dao/models/Users.model.js"
 import { createHash, isValidPassword } from "../utils.js"
 import GitHubStrategy from "passport-github2"
+import jwt from "jsonwebtoken"
 
 const LocalStrategy = local.Strategy
 
@@ -10,8 +11,8 @@ const initializePassport = async () => {
     passport.use("register", new LocalStrategy({passReqToCallback: true, usernameField: "email", session: false},
     async (req, email, password, done) => {
         try {
-            const {first_name, last_name, birthDate, dni, gender} = req.body
-            if(!first_name || !last_name || !birthDate || !dni || !gender) return done(null, false, {message: "Faltan datos"})
+            const {first_name, last_name} = req.body
+            if(!first_name || !last_name) return done(null, false, {message: "Faltan datos"})
             const exists = await userModel.findOne({email})
             if(exists) return done(null, false, {message: "Usuario existente"})
 
@@ -21,9 +22,6 @@ const initializePassport = async () => {
                 first_name,
                 last_name,
                 email,
-                birthDate,
-                dni,
-                gender,
                 password: hashPassword
             }
 

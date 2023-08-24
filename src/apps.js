@@ -15,6 +15,7 @@ import messagesRouter from "./routes/messages.router.js"
 
 import initializePassport from "./config/passport.config.js"
 import passport from "passport"
+import cookieParser from "cookie-parser"
 
 
 
@@ -47,6 +48,7 @@ app.engine("handlebars", handlebars.engine())
 app.set("views", __dirname + "/views")
 app.set("view engine", "handlebars")
 
+app.use(cookieParser())
 app.use("/api/products", productsRouter)
 app.use("/api/carts", cartsRouter)
 app.use("/api/messages", messagesRouter)

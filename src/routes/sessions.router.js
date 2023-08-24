@@ -1,9 +1,14 @@
 import { Router } from "express"
 import userModel from "../dao/models/Users.model.js"
 import passport from "passport"
-import {createHash} from "../utils.js"
-import jwt from "jsonwebtoken"
+import {createHash, generateToken} from "../utils.js"
+import passportControl from "../middlewares/passport-control.middleware.js"
 import auth from "../middlewares/auth.middlewares.js"
+
+const authMid = [
+    passportControl("jwt",
+    auth("user"))
+]
 
 const router = Router()
 
@@ -19,8 +24,16 @@ router.post("/login", passport.authenticate("login", {passReqToCallback: true, s
         email: req.user.email
     }
 
-    const token = jwt.sign(serialUser, "coderUser", {expiresIn: "1h"})
-    res.cookie("coderCookie", token, {maxAge: 36000000})
+    const email = req.user.email
+    const role = req.user.role
+
+    const access_token = generateToken({email, role: role})
+
+    res.cookie("CoderCookie", access_token, {
+        maxAge: 60*60*1000,
+        httpOnly: true
+    })
+
     res.status(200).send({status:"success", payload: serialUser})
 })
 
@@ -66,7 +79,9 @@ router.post("/logout", (req, res) => {
     })
 })
 
-router.get("/current", auth, (req, res) => {
-    console.log(req.user);
+
+router.get("/current", authMid, async (req, res) => {
+    res.json({payload: req.user})
 })
+
 export default router

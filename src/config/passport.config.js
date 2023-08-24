@@ -3,7 +3,6 @@ import local from "passport-local"
 import userModel from "../dao/models/Users.model.js"
 import { createHash, isValidPassword } from "../utils.js"
 import GitHubStrategy from "passport-github2"
-import jwt from "jsonwebtoken"
 
 const LocalStrategy = local.Strategy
 
@@ -37,6 +36,8 @@ const initializePassport = async () => {
         try {
             const user = await userModel.findOne({email})
             if(!user) return done(null, false, {message: "Usuario inexistente"})
+            
+            user.role = "user"
 
             const validatePassword = await isValidPassword(user, password)
             if(!validatePassword) return done(null, false, {message: "Contraseña incorrecta"})
